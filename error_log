@@ -1,0 +1,6 @@
+[17-Jul-2017 03:58:24 UTC] PHP Warning:  require(/home/dulcer10/public_html/../bootstrap/autoload.php): failed to open stream: No such file or directory in /home/dulcer10/public_html/index.php on line 22
+[17-Jul-2017 03:58:24 UTC] PHP Fatal error:  require(): Failed opening required '/home/dulcer10/public_html/../bootstrap/autoload.php' (include_path='.:/opt/alt/php56/usr/share/pear:/opt/alt/php56/usr/share/php') in /home/dulcer10/public_html/index.php on line 22
+[17-Jul-2017 03:58:29 UTC] PHP Warning:  require(/home/dulcer10/public_html/../bootstrap/autoload.php): failed to open stream: No such file or directory in /home/dulcer10/public_html/index.php on line 22
+[17-Jul-2017 03:58:29 UTC] PHP Fatal error:  require(): Failed opening required '/home/dulcer10/public_html/../bootstrap/autoload.php' (include_path='.:/opt/alt/php56/usr/share/pear:/opt/alt/php56/usr/share/php') in /home/dulcer10/public_html/index.php on line 22
+[23-Jul-2017 14:48:41 America/Mexico_City] PHP Parse error:  syntax error, unexpected ':' in /home/dulcer10/public_html/app/admin/Pedidos.php on line 135
+[30-Jul-2017 16:28:31 America/Mexico_City] PHP Parse error:  syntax error, unexpected ':' in /home/dulcer10/public_html/app/admin/Pedidos.php on line 135
