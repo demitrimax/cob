@@ -3,6 +3,7 @@
 namespace App\admin;
 use DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Clientes extends Model
 {
@@ -10,6 +11,15 @@ class Clientes extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
     public $allow_image = array('png', 'jpg', 'jpeg', 'gif');
+
+    protected $casts = [
+      'id'            => 'integer',
+      'nacimiento'    => 'date',
+      'nombre'        => 'string',
+      'paterno'       => 'string',
+      'materno'       => 'string',
+
+    ];
 
     public function getAll($table){
       return DB::table($table)->where('status',1)->get();
@@ -24,6 +34,10 @@ class Clientes extends Model
       }
     }
 
+    public function getNombrecompletoAttribute()
+    {
+      return $this->nombre.' '.$this->paterno.' '.$this->materno;
+    }
     public function getPermissionsView($id){
       $permissions = Permissions::select(array('permissions.*'));
       $permissions->where('permissions.id', $id);
@@ -192,10 +206,12 @@ class Clientes extends Model
     public function addClientes($request){
       $clientes = new Clientes;
 
+        $clientes->curp = $request->input('curp')!="" ? $request->input('curp') : "";
         $clientes->nombre = $request->input('nombre')!="" ? $request->input('nombre') : "";
       	$clientes->paterno = $request->input('paterno')!="" ? $request->input('paterno') : "";
       	$clientes->materno = $request->input('materno')!="" ? $request->input('materno') : "";
-      	$clientes->nacimiento = null;
+      	$clientes->nacimiento = $request->input('nacimiento')!="" ? $request->input('nacimiento') : "";
+        $clientes->curpdat = $request->input('curpdat')!="" ? $request->input('curpdat') : "";
       	$clientes->telefono = $request->input('telefono')!="" ? $request->input('telefono') : "";
       	$clientes->celular = $request->input('celular')!="" ? $request->input('celular') : "";
       	$clientes->trabajo = $request->input('trabajo')!="" ? $request->input('trabajo') : "";

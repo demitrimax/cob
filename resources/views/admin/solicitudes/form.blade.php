@@ -227,8 +227,21 @@
 			<div class="panel-body">
 
 				<div class="row">
+
+          <!-- CURP Start -->
+					<div class="col-md-3">
+					<div class="form-group has-danger">
+					     <label for="curp" class="control-label"> CURP </label> <span class="text-danger">*</span>
+					      <input type="text" class="form-control" id="curp" name="curp"
+					      value="{{{ isset($cliente->curp ) ? $cliente->nombre  : old('curp') }}}" maxlength="18" onchange="validarInput(this)">
+                <small class="form-control-feedback callout" id="resultado"> </small>
+          <div class="label label-danger">{{ $errors->first("curp") }}</div>
+					</div>
+					</div>
+					<!-- Nombre End -->
+
 					<!-- Nombre Start -->
-					<div class="col-md-4">
+					<div class="col-md-3">
 					<div class="form-group">
 					<label for="nombre" class="control-label"> Nombre </label>
 					<input type="text" class="form-control" id="nombre" name="nombre"
@@ -239,7 +252,7 @@
 					<!-- Nombre End -->
 
 					<!-- Paterno Start -->
-					<div class="col-md-4">
+					<div class="col-md-3">
 					<div class="form-group">
 					<label for="paterno" class="control-label"> Apellido paterno </label>
 					<input type="text" class="form-control" id="paterno" name="paterno"
@@ -250,18 +263,19 @@
 					<!-- Paterno End -->
 
 					<!-- Materno Start -->
-					<div class="col-md-4">
+					<div class="col-md-3">
 					<div class="form-group">
 					<label for="materno" class="control-label">Apellido materno </label>
 					<input type="text" class="form-control" id="materno" name="materno"
-					value="{{{ isset($cliente->materno ) ? $cliente->materno  : old('materno') }}}" maxlength="150">
+					value="{{{ isset($cliente->materno ) ? $cliente->materno  : old('materno') }}}" maxlength="150"
+          onchange="validarNombrecompleto()">
 					<div class="label label-danger">{{ $errors->first("materno") }}</div>
 					</div>
 					</div>
 					<!-- Materno End -->
 
 					<!-- Nacimiento Start -->
-					<div class="col-md-2" style="display:none">
+					<div class="col-md-3" style="display:none" id="col_nacimiento">
 					<div class="form-group">
 					<label for="nacimiento" class="control-label">F. Nacimiento </label>
 					<input type="text" class="form-control dates" id="nacimiento" name="nacimiento" style="background:#FFF;" readonly
@@ -361,6 +375,8 @@
 					</div>
 					</div>
 					<!-- Calle End -->
+
+          <input type="hidden" class="form-control" id="cupdat" name="curpdat">
 
 					<input type="hidden" class="form-control" id="latitud" name="latitud" value="{{{ isset($cliente->latitud ) ? $cliente->latitud  : old('latitud') }}}" maxlength="150">
 					<input type="hidden" class="form-control" id="longitud" name="longitud" value="{{{ isset($cliente->longitud ) ? $cliente->longitud  : old('longitud') }}}" maxlength="150">
@@ -1417,9 +1433,155 @@
       // address fields in the form.
       autocomplete.addListener('place_changed', codeAddressCte);
     /* TERMINAN FUNCIONES, MAPA AVAL DEL CLIENTE  */
+}
+    //Función para validar una CURP
+    function curpValida(curp) {
+        var re = /^([A-Z][AEIOUX][A-Z]{2}\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\d])(\d)$/,
+            validado = curp.match(re);
+
+        if (!validado)  //Coincide con el formato general?
+          return false;
+
+        //Validar que coincida el dígito verificador
+        function digitoVerificador(curp17) {
+            //Fuente https://consultas.curp.gob.mx/CurpSP/
+            var diccionario  = "0123456789ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
+                lngSuma      = 0.0,
+                lngDigito    = 0.0;
+            for(var i=0; i<17; i++)
+                lngSuma = lngSuma + diccionario.indexOf(curp17.charAt(i)) * (18 - i);
+            lngDigito = 10 - lngSuma % 10;
+            if (lngDigito == 10) return 0;
+            return lngDigito;
+        }
+
+        if (validado[2] != digitoVerificador(validado[1]))
+          return false;
+
+        return true; //Validado
+    }
 
 
-	}
+    //Handler para el evento cuando cambia el input
+    //Lleva la CURP a mayúsculas para validarlo
+    function validarInput(input) {
+        var curp = input.value.toUpperCase(),
+            resultado = document.getElementById("resultado"),
+            valido = "No válido";
+            //resultado.classList.add("callout-info");
+
+        if (curpValida(curp)) { // ⬅️ Acá se comprueba
+          valido = "Válido";
+            resultado.classList.add("callout-success");
+            console.log(formatDate(curp2date(curp)));
+            console.log(curpGenero(curp));
+            getCURPInfo(curp);
+
+        } else {
+          resultado.classList.remove("ok");
+          resultado.classList.add("callout-danger");
+        }
+
+        resultado.innerText = "Formato: " + valido;
+
+    }
+
+    function curp2date(curp) {
+      var m = curp.match( /^\w{4}(\w{2})(\w{2})(\w{2})/ );
+      //miFecha = new Date(año,mes,dia)
+      var anyo = parseInt(m[1],10)+1900;
+      if( anyo < 1950 ) anyo += 100;
+      var mes = parseInt(m[2], 10)-1;
+      var dia = parseInt(m[3], 10);
+      return (new Date( anyo, mes, dia ));
+    }
+
+    function formatDate(date) {
+      var d = new Date(date),
+          month = '' + (d.getMonth() + 1),
+          day = '' + d.getDate(),
+          year = d.getFullYear();
+
+      if (month.length < 2) month = '0' + month;
+      if (day.length < 2) day = '0' + day;
+
+      return [year, month, day].join('-');
+  }
+
+  function curpGenero(curp) {
+    var m = curp;
+    //miFecha = new Date(año,mes,dia)
+    var genero = m.substr(10,1);
+    return genero;
+  }
+
+function getCURPInfo(CURP) {
+  var settings = {
+	"async": true,
+	"crossDomain": true,
+	"url": "https://curp-renapo.p.rapidapi.com/v1/curp/"+CURP+"?options%5Brfc%5D=true",
+	"method": "GET",
+	"headers": {
+		"x-rapidapi-host": "curp-renapo.p.rapidapi.com",
+		"x-rapidapi-key": "fae0b7e29dmshc2c848e76ff2bf0p1d842djsn85e69edbe154"
+	   }
+  }
+
+  $.ajax(settings).done(function (response) {
+  	console.log(response);
+    var birthdate = response.brithdate;
+    var nombre = response.names;
+    var apellido_p = response.paternal_surname;
+    var apellido_m = response.mothers_maiden_name;
+    var nacimiento = response.birthdate;
+    var curp = response.curp;
+    $("#curpdat").val(response);
+    $("#nombre").val(nombre);
+    $("#paterno").val(apellido_p);
+    $("#materno").val(apellido_m);
+    $("#col_nacimiento").show();
+    $("#nacimiento").val(formatDate(curp2date(curp)));
+    validarNombrecompleto();
+  });
+
+}
+
+function validarNombrecompleto(){
+  var nombre =  $("#nombre").val();
+  var paterno = $("#paterno").val();
+  var materno = $("#materno").val();
+
+		if(!materno == '' && !paterno == '' && !nombre =='') {
+
+      $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+      //Traemos la informacion del producto
+			$.ajax({
+				url: " {{url('/admin/solicitudes/verificarnombre')}}",
+				dataType: 'json',
+        type: "POST",
+        data: {'nombre':nombre, 'paterno':paterno, 'materno':materno},
+				success: function(json) {
+          console.log(json);
+					if(json['tipo']) {
+
+            	swal({ title: "ERROR!!", text: json['mensaje'], type: "error"});
+
+              $('.btn-save').fadeOut();
+            } else {
+                $('.btn-save').show();
+            }
+
+					}
+
+				}); //AJAX END
+      }//FIN DE LA VALIDACION DE NOMBRES
+
+    }
+
 
 </script>
 <!-- src="https://maps.googleapis.com/maps/api/js?sensor=false&amp;libraries=places&amp;key=AIzaSyBpZATF1F7TFEPCMxIx8nOPD0Ryi3V0BsE&callback=initMap" -->

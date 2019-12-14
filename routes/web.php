@@ -190,6 +190,7 @@ Route::get("/admin/solicitudes/baja/{id}", "admin\SolicitudesController@baja")->
 Route::get("/admin/solicitudes/alta/{id}", "admin\SolicitudesController@alta")->middleware('auth');
 Route::get("/admin/solicitudes/ajax/{id}", "admin\SolicitudesController@getAjax")->middleware('auth');
 Route::get("/admin/solicitudes/rechazos", "admin\SolicitudesController@rechazos")->middleware('auth');
+Route::post("/admin/solicitudes/verificarnombre", "admin\SolicitudesController@validarNombrecompleto")->middleware('auth');
 Route::get("/admin/solicitudes/avanzar/{id}", "admin\SolicitudesController@postAvanza")->middleware('auth');
 
 Route::get("/admin/solicitudes/aprobar/{id}", "admin\SolicitudesController@potAprueba")->middleware('auth');

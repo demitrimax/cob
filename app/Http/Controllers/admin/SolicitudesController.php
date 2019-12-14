@@ -9,6 +9,7 @@ use DB;
 use Illuminate\Support\Facades\Input;
 use Session;
 use Auth;
+use Illuminate\Validation\Rule;
 
 class SolicitudesController extends Controller
 {
@@ -200,7 +201,39 @@ class SolicitudesController extends Controller
 
         $creditos     = new \App\admin\Creditos;
 
+        //verificar que no exista el cliente en la base de datos
+        $cnombre = $request->input('nombre');
+        $cpaterno = $request->input('paterno');
+        $cmaterno = $request->input('materno');
+
+        $buscarcliente = \App\admin\Clientes::where('nombre','like', '%'.$cnombre.'%')
+                                            ->where('paterno', 'like', '%'.$cpaterno.'%')
+                                            ->where('materno','like','%'.$cmaterno.'%')
+                                            ->get();
+
+        $nomcompleto = $cnombre.' '.$cpaterno.' '.$cmaterno;
+          $nomcompleto = trim($nomcompleto);
+
+        foreach($buscarcliente as $cliente)
+        {
+          if($cliente->nombrecompleto == $nomcompleto){
+            Session::flash('fracaso', 'true');
+            Session::flash('message', 'El nombre del cliente ya existe!');
+            return back();
+          }
+        }
+
+
+        $rules = [
+          'documento' => 'file|size:2500'
+        ];
+        $messages = [
+          'documento.size'  => 'El documento no puede exdecer de más de: $size'
+        ];
+        $this->validate($request, $rules, $messages);
+
         $cliente_id = $clientes->addClientes($request);
+        //dd($request);
 
         if($request->input('prospecto_id') != 0) {
 
@@ -1097,4 +1130,44 @@ class SolicitudesController extends Controller
         return array('error' => 1, 'msg' => 'Clave de supervisor no encontrada, por favor intente de nuevo o contacte con el supervisor a cargo');
       }
     }
+
+    public function validarNombrecompleto(Request $request)
+    {
+      $input = $request->all();
+
+      $nombre = $request->input('nombre');
+      $paterno = $request->input('paterno');
+      $materno = $request->input('materno');
+
+      //$nombre, $paterno, $materno
+      $resultado = ['tipo'=>false, 'mensaje'=>'No se ha procesado', 'nomcliente'=> 'vacio', 'request'=>$input];
+      //función que valida el nombre completo del usuario
+      $buscarcliente = \App\admin\Clientes::where('nombre','like', '%'.$nombre.'%')
+                                          ->where('paterno', 'like', '%'.$paterno.'%')
+                                          ->where('materno','like','%'.$materno.'%')
+                                          ->get();
+      $ccompleto = trim($nombre).' '.trim($paterno).' '.trim($materno);
+      $ccompleto = trim($ccompleto);
+
+      $buscarcliente2 = \App\admin\Clientes::where('nombre','like', '%'.$ccompleto.'%')
+                                          ->get();
+
+      if($buscarcliente->count() > 0)
+      {
+         $resultado = ['tipo'=>true, 'mensaje'=>'Cliente ya existe en la base de datos', 'nomcliente'=>$ccompleto, 'request'=>$input];
+      }
+      else
+      {
+        $resultado = ['tipo'=>false, 'mensaje'=>'No se ha encontrado en la base de datos', 'nomcliente'=>$ccompleto, 'request'=>$input];
+        if($buscarcliente2->count() > 0)
+        {
+           $resultado = ['tipo'=>true, 'mensaje'=>'Se encontró el cliente ya existe en la base de datos', 'nomcliente'=>$ccompleto, 'request'=>$input];
+        }
+      }
+
+
+        return $resultado;
+    }
+
+
 }
