@@ -236,6 +236,7 @@
 					      value="{{{ isset($cliente->curp ) ? $cliente->nombre  : old('curp') }}}" maxlength="18" onchange="validarInput(this)">
                 <small class="form-control-feedback callout" id="resultado"> </small>
           <div class="label label-danger">{{ $errors->first("curp") }}</div>
+                    <input type="hidden" class="form-control" id="curpdat" name="curpdat" value="">
 					</div>
 					</div>
 					<!-- Nombre End -->
@@ -375,8 +376,6 @@
 					</div>
 					</div>
 					<!-- Calle End -->
-
-          <input type="hidden" class="form-control" id="cupdat" name="curpdat">
 
 					<input type="hidden" class="form-control" id="latitud" name="latitud" value="{{{ isset($cliente->latitud ) ? $cliente->latitud  : old('latitud') }}}" maxlength="150">
 					<input type="hidden" class="form-control" id="longitud" name="longitud" value="{{{ isset($cliente->longitud ) ? $cliente->longitud  : old('longitud') }}}" maxlength="150">
@@ -1535,7 +1534,9 @@ function getCURPInfo(CURP) {
     var apellido_m = response.mothers_maiden_name;
     var nacimiento = response.birthdate;
     var curp = response.curp;
+
     $("#curpdat").val(response);
+
     $("#nombre").val(nombre);
     $("#paterno").val(apellido_p);
     $("#materno").val(apellido_m);
