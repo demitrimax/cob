@@ -171,6 +171,7 @@ Route::get("/admin/clientes/view/{id}", "admin\ClientesController@view")->middle
 Route::get("/admin/clientes/baja/{id}", "admin\ClientesController@baja")->middleware('auth');
 Route::get("/admin/clientes/alta/{id}", "admin\ClientesController@alta")->middleware('auth');
 Route::get("/admin/clientes/ajax/{id}", "admin\ClientesController@getAjax")->middleware('auth');
+Route::post('/admin/clientes/telefonos/duplicados', 'admin\ClientesController@BuscarTelefonosDuplicadosAjax')->middleware('auth');
   //  EO : Clientes
 
 

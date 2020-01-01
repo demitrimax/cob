@@ -18,6 +18,7 @@ class Clientes extends Model
       'nombre'        => 'string',
       'paterno'       => 'string',
       'materno'       => 'string',
+      'curp'          => 'string',
 
     ];
 

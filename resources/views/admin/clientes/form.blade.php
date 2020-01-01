@@ -18,8 +18,19 @@
 			<div class="panel-body">
 
 				<div class="row">
+          <!-- CURP Start -->
+					<div class="col-md-3">
+					<div class="form-group has-danger">
+					     <label for="curp" class="control-label"> CURP </label> <span class="text-danger">*</span>
+					      <input type="text" class="form-control" id="curp" name="curp"
+					      value="{!! isset($data->curp ) ? $data->curp  : old('curp') !!}" maxlength="18" onchange="validarInput(this)">
+                <small class="form-control-feedback callout" id="resultado"> </small>
+          <div class="label label-danger">{{ $errors->first("curp") }}</div>
+                    <input type="hidden" class="form-control" id="curpdat" name="curpdat" value="">
+					</div>
+					</div>
 					<!-- Nombre Start -->
-					<div class="col-md-4">
+					<div class="col-md-3">
 					<div class="form-group">
 					<label for="nombre" class="control-label"> Nombre </label>
 					<input type="text" class="form-control" id="nombre" name="nombre"
@@ -30,7 +41,7 @@
 					<!-- Nombre End -->
 
 					<!-- Paterno Start -->
-					<div class="col-md-4">
+					<div class="col-md-3">
 					<div class="form-group">
 					<label for="paterno" class="control-label"> Apellido paterno </label>
 					<input type="text" class="form-control" id="paterno" name="paterno"
@@ -41,7 +52,7 @@
 					<!-- Paterno End -->
 
 					<!-- Materno Start -->
-					<div class="col-md-4">
+					<div class="col-md-3">
 					<div class="form-group">
 					<label for="materno" class="control-label">Apellido materno </label>
 					<input type="text" class="form-control" id="materno" name="materno"
@@ -67,7 +78,7 @@
 					<div class="form-group">
 					<label for="telefono" class="control-label">Teléfono </label>
 					<input type="text" class="form-control" id="telefono" name="telefono"
-					value="{{{ isset($data->telefono ) ? $data->telefono  : old('telefono') }}}" maxlength="10">
+					value="{{{ isset($data->telefono ) ? $data->telefono  : old('telefono') }}}" maxlength="10" onchange="buscarTelefonoDuplicado(this)" >
 					<div class="label label-danger">{{ $errors->first("telefono") }}</div>
 					</div>
 					</div>
@@ -781,9 +792,9 @@
 	function initMap() {
 
 		var geocoder = new google.maps.Geocoder();
-		var myLatLng = {lat: <?= (isset($data->latitud) ? $data->latitud : '21.884445885085846')?>, lng: <?= (isset($data->longitud) ? $data->longitud : '-102.29212165869137')?>};
+		var myLatLng = {lat: {!! (isset($data->latitud) && !empty($data->latitud)) ? $data->latitud  : '21.884445885085846' !!}, lng: {!! (isset($data->longitud) && !empty($data->longitud)) ? $data->longitud : '-102.29212165869137' !!} };
 
-		/* INICIAN FUNCIONES, MAPA DEL CLIENTE */
+		/* INICIAN FUNCIONES, MAPA DEL CLIENTE --*/
 			var cteMap = new google.maps.Map(document.getElementById('cteMap'), {
 					zoom: 13,
 					center: myLatLng
@@ -1188,6 +1199,118 @@
 
 
 	}
+
+  //Función para validar una CURP
+  function curpValida(curp) {
+      var re = /^([A-Z][AEIOUX][A-Z]{2}\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])[HM](?:AS|B[CS]|C[CLMSH]|D[FG]|G[TR]|HG|JC|M[CNS]|N[ETL]|OC|PL|Q[TR]|S[PLR]|T[CSL]|VZ|YN|ZS)[B-DF-HJ-NP-TV-Z]{3}[A-Z\d])(\d)$/,
+          validado = curp.match(re);
+
+      if (!validado)  //Coincide con el formato general?
+        return false;
+
+      //Validar que coincida el dígito verificador
+      function digitoVerificador(curp17) {
+          //Fuente https://consultas.curp.gob.mx/CurpSP/
+          var diccionario  = "0123456789ABCDEFGHIJKLMNÑOPQRSTUVWXYZ",
+              lngSuma      = 0.0,
+              lngDigito    = 0.0;
+          for(var i=0; i<17; i++)
+              lngSuma = lngSuma + diccionario.indexOf(curp17.charAt(i)) * (18 - i);
+          lngDigito = 10 - lngSuma % 10;
+          if (lngDigito == 10) return 0;
+          return lngDigito;
+      }
+
+      if (validado[2] != digitoVerificador(validado[1]))
+        return false;
+
+      return true; //Validado
+  }
+
+
+  //Handler para el evento cuando cambia el input
+  //Lleva la CURP a mayúsculas para validarlo
+  function validarInput(input) {
+      var curp = input.value.toUpperCase(),
+          resultado = document.getElementById("resultado"),
+          valido = "No válido";
+          //resultado.classList.add("callout-info");
+
+      if (curpValida(curp)) { // ⬅️ Acá se comprueba
+        valido = "Válido";
+          resultado.classList.add("callout-success");
+          console.log(formatDate(curp2date(curp)));
+          console.log(curpGenero(curp));
+          //getCURPInfo(curp);
+
+      } else {
+        resultado.classList.remove("ok");
+        resultado.classList.add("callout-danger");
+      }
+
+      resultado.innerText = "Formato: " + valido;
+
+  }
+
+  function curp2date(curp) {
+    var m = curp.match( /^\w{4}(\w{2})(\w{2})(\w{2})/ );
+    //miFecha = new Date(año,mes,dia)
+    var anyo = parseInt(m[1],10)+1900;
+    if( anyo < 1950 ) anyo += 100;
+    var mes = parseInt(m[2], 10)-1;
+    var dia = parseInt(m[3], 10);
+    return (new Date( anyo, mes, dia ));
+  }
+
+  function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+function curpGenero(curp) {
+  var m = curp;
+  //miFecha = new Date(año,mes,dia)
+  var genero = m.substr(10,1);
+  return genero;
+}
+
+function buscarTelefonoDuplicado(campo) {
+  var mitelefono = $(campo).val();
+
+  $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+  //Buscar los telefonos duplicados
+  $.ajax({
+    url: " {{url('/admin/clientes/telefonos/duplicados')}}",
+    dataType: 'json',
+    type: "POST",
+    data: {'telefono': mitelefono },
+    success: function(json) {
+      console.log(json);
+      if(json['error']) {
+
+          swal({ title: "ERROR!!", text: json['msg'], type: "error"});
+
+          $('.btn-save').fadeOut();
+        } else {
+            $('.btn-save').show();
+        }
+
+      }
+
+    }); //AJAX END
+
+}
 
 </script>
 <!-- src="https://maps.googleapis.com/maps/api/js?sensor=false&amp;libraries=places&amp;key=AIzaSyBpZATF1F7TFEPCMxIx8nOPD0Ryi3V0BsE&callback=initMap" -->
