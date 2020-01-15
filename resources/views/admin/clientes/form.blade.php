@@ -1297,7 +1297,8 @@ function buscarTelefonoDuplicado(campo) {
     data: {'telefono': mitelefono },
     success: function(json) {
       console.log(json);
-      if(json['error']) {
+
+      if(json['error'] && !json['cliente'] == {!! $data->id !!} ) {
 
           swal({ title: "ERROR!!", text: json['msg'], type: "error"});
 

@@ -362,7 +362,7 @@ if (Auth::check()) {
     $('.delete').on('click',function(){
 
       var url = $(this).attr('data-url');
-      
+
       if(url != "") {
 
         swal({

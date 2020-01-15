@@ -291,7 +291,7 @@
 					<div class="form-group">
 					<label for="telefono" class="control-label">Teléfono </label>
 					<input type="text" class="form-control" id="telefono" name="telefono"
-					value="{{{ isset($cliente->telefono ) ? $cliente->telefono  : old('telefono') }}}" maxlength="10">
+					value="{{{ isset($cliente->telefono ) ? $cliente->telefono  : old('telefono') }}}" maxlength="10" onchange="buscarTelefonoDuplicado(this)">
 					<div class="label label-danger">{{ $errors->first("telefono") }}</div>
 					</div>
 					</div>
@@ -302,7 +302,7 @@
 					<div class="form-group">
 					<label for="celular" class="control-label">Celular </label>
 					<input type="text" class="form-control" id="celular" name="celular"
-					value="{{{ isset($cliente->celular ) ? $cliente->celular  : old('celular') }}}"  maxlength="10">
+					value="{{{ isset($cliente->celular ) ? $cliente->celular  : old('celular') }}}"  maxlength="10" onchange="buscarTelefonoDuplicado(this)">
 					<div class="label label-danger">{{ $errors->first("celular") }}</div>
 					</div>
 					</div>
@@ -314,7 +314,7 @@
 					<div class="form-group">
 					<label for="celular" class="control-label">Tel. Trabajo </label>
 					<input type="text" class="form-control" id="trabajo" name="trabajo"
-					value="{{{ isset($cliente->trabajo ) ? $cliente->trabajo  : old('trabajo') }}}"  maxlength="10">
+					value="{{{ isset($cliente->trabajo ) ? $cliente->trabajo  : old('trabajo') }}}"  maxlength="10" onchange="buscarTelefonoDuplicado(this)">
 					<div class="label label-danger">{{ $errors->first("trabajo") }}</div>
 					</div>
 					</div>
@@ -1580,6 +1580,43 @@ function validarNombrecompleto(){
 
 				}); //AJAX END
       }//FIN DE LA VALIDACION DE NOMBRES
+
+    }
+
+    function buscarTelefonoDuplicado(campo) {
+      var mitelefono = $(campo).val();
+
+      if($(campo).val().length < 10) {
+        alert("El teléfono debe tener 10 digitos. Ej. 666112233");
+        return false;  
+    }
+
+      $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+      //Buscar los telefonos duplicados
+      $.ajax({
+        url: " {{url('/admin/clientes/telefonos/duplicados')}}",
+        dataType: 'json',
+        type: "POST",
+        data: {'telefono': mitelefono },
+        success: function(json) {
+          console.log(json);
+
+          if(json['error'] ) {
+
+              swal({ title: "ERROR!!", text: json['msg'], type: "error"});
+
+              $('.btn-save').fadeOut();
+            } else {
+                $('.btn-save').show();
+            }
+
+          }
+
+        }); //AJAX END
 
     }
 

@@ -552,4 +552,8 @@ class Solicitudes extends Model
     public function etapa(){
         return $this->hasOne('\App\admin\Etapas', 'id', 'etap_flujo');
     }
+    public function telefonos()
+    {
+      return $this->belongsToMany('App\Models\ctelefonos', 'cliente_id', '');
+    }
 }

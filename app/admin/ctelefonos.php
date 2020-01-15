@@ -17,12 +17,13 @@ class ctelefonos extends Model
       'id'            => 'integer',
       'tipo'          => 'string',
       'numero'        => 'integer',
+      'pertenece_a'   => 'string',
 
     ];
 
     public function clientes()
     {
-      return $this->belongsToMany('App\admin\ctelefonos');
+      return $this->belongsToMany('App\admin\ctelefonos', 'cliente_id', 'ctelefonos');
     }
 
 }
