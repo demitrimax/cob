@@ -12,7 +12,7 @@ use Auth;
 
 class ClientesController extends Controller
 {
-    public $v_fields=array('clientes.curp, clientes.nombre', 'clientes.paterno', 'clientes.materno', 'clientes.nacimiento', 'clientes.telefono', 'clientes.celular', 'clientes.trabajo', 'clientes.correo', 'clientes.calle', 'clientes.colonia', 'clientes.ciudad', 'clientes.estado', 'clientes.cp', 'clientes.ocupacion', 'clientes.trabaja', 'clientes.ingreso_mensual', 'clientes.ingreso_extra', 'clientes.gasto_mensual', 'clientes.fiador_nombre', 'clientes.fiador_telefono', 'clientes.fiador_celular', 'clientes.fiador_trabajo', 'clientes.fiador_calle', 'clientes.fiador_colonia', 'clientes.fiador_ciudad', 'clientes.fiador_estado', 'clientes.fiador_cp', 'clientes.fiador_latitud', 'clientes.fiador_longitud', 'clientes.referencia1_nombre', 'clientes.referencia1_parentesco', 'clientes.referencia1_celular', 'clientes.referencia1_domicilio', 'clientes.referencia1_latitud', 'clientes.referencia1_longitud', 'clientes.referencia2_nombre', 'clientes.referencia2_parentesco', 'clientes.referencia2_celular', 'clientes.referencia2_domicilio', 'clientes.referencia2_latitud', 'clientes.referencia2_longitud', 'clientes.referencia3_nombre', 'clientes.referencia3_parentesco', 'clientes.referencia3_celular', 'clientes.referencia3_domicilio', 'clientes.referencia3_latitud', 'clientes.referencia3_longitud', 'clientes.latitud', 'clientes.longitud', 'clientes.status');
+    public $v_fields=array('clientes.curp', 'clientes.nombre', 'clientes.paterno', 'clientes.materno', 'clientes.nacimiento', 'clientes.telefono', 'clientes.celular', 'clientes.trabajo', 'clientes.correo', 'clientes.calle', 'clientes.colonia', 'clientes.ciudad', 'clientes.estado', 'clientes.cp', 'clientes.ocupacion', 'clientes.trabaja', 'clientes.ingreso_mensual', 'clientes.ingreso_extra', 'clientes.gasto_mensual', 'clientes.fiador_nombre', 'clientes.fiador_telefono', 'clientes.fiador_celular', 'clientes.fiador_trabajo', 'clientes.fiador_calle', 'clientes.fiador_colonia', 'clientes.fiador_ciudad', 'clientes.fiador_estado', 'clientes.fiador_cp', 'clientes.fiador_latitud', 'clientes.fiador_longitud', 'clientes.referencia1_nombre', 'clientes.referencia1_parentesco', 'clientes.referencia1_celular', 'clientes.referencia1_domicilio', 'clientes.referencia1_latitud', 'clientes.referencia1_longitud', 'clientes.referencia2_nombre', 'clientes.referencia2_parentesco', 'clientes.referencia2_celular', 'clientes.referencia2_domicilio', 'clientes.referencia2_latitud', 'clientes.referencia2_longitud', 'clientes.referencia3_nombre', 'clientes.referencia3_parentesco', 'clientes.referencia3_celular', 'clientes.referencia3_domicilio', 'clientes.referencia3_latitud', 'clientes.referencia3_longitud', 'clientes.latitud', 'clientes.longitud', 'clientes.status');
     public $allow_image = array('png', 'jpg', 'jpeg', 'gif');
 
     public function index(Request $request){
@@ -52,6 +52,7 @@ class ClientesController extends Controller
             $searchValue = $_GET['searchValue'];
         }
 
+
         // get by modal
         $clientes = new \App\admin\Clientes;
 
@@ -74,6 +75,7 @@ class ClientesController extends Controller
         );
 
         $data = $clientes->getClientesData($per_page, $searchBy, $searchValue, $sortBy, $order);
+        //dd($data);
 
         return view('admin/clientes/index', ['data'=>$data->appends(Input::except('page')), 'per_page'=>$per_page, 'links'=>$links,'config'=>$config]);
     }

@@ -12,8 +12,10 @@ use Auth;
 
 class CreditosController extends Controller
 {
-    public $v_fields=array('creditos.fondeador_id', 'creditos.cliente_id', 'creditos.solicitud_id', 'creditos.supervisor_id', 'creditos.vendedor_id', 'creditos.folio', 'creditos.plazo', 'creditos.monto_fondeado', 'creditos.pago', 'creditos.interes', 'creditos.porcentaje', 'creditos.insoluto', 'creditos.actual', 'creditos.inicio', 'creditos.termino', 'creditos.vencida', 'creditos.dias_vencida', 'creditos.fech_ecv', 'creditos.recargos', 'creditos.puntaje', 'creditos.status');
+    public $v_fields=array('creditos.fondeador_id', 'creditos.cliente_id', 'creditos.solicitud_id', 'creditos.supervisor_id', 'creditos.vendedor_id', 'creditos.folio', 'creditos.plazo', 'creditos.monto_fondeado', 'creditos.pago', 'creditos.interes', 'creditos.porcentaje', 'creditos.insoluto', 'creditos.actual', 'creditos.inicio', 'creditos.termino', 'creditos.vencida', 'creditos.dias_vencida', 'creditos.fech_ecv', 'creditos.recargos', 'creditos.puntaje', 'creditos.status',
+                            'clientes.nombre', 'clientes.paterno', 'clientes.materno');
     public $allow_image = array('png', 'jpg', 'jpeg', 'gif');
+
 
     public function index(Request $request){
           $sortBy='';
@@ -72,10 +74,11 @@ class CreditosController extends Controller
               'href' => url('/admin/creditos'),
               'active' => false
           );
-
+          $searchFields = ['creditos.folio'=>'Folio', 'clientes.nombre' => 'Nombre Cliente', 'clientes.paterno'=>'a paterno Cliente', 'clientes.materno'=>'a materno Cliente' ];
+          //dd($searchValue);
           $data = $creditos->getCreditosData($per_page, $searchBy, $searchValue, $sortBy, $order,2);
 
-          return view('admin/creditos/index', ['data'=>$data->appends(Input::except('page')), 'per_page'=>$per_page, 'links'=>$links,'config'=>$config]);
+          return view('admin/creditos/index', ['data'=>$data->appends(Input::except('page')), 'per_page'=>$per_page, 'links'=>$links,'config'=>$config, 'sfields'=>$searchFields]);
     }
 
     public function pagados(Request $request){
