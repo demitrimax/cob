@@ -34,7 +34,7 @@ $redirect = url('/').'/admin/documentos?'.urlencode($_SERVER["QUERY_STRING"]);
           <div class="white-box">
 
             <div class="pull-left">
-                <button class="btn btn-default" data-toggle="modal" title="Imprimir Listado" data-target="#modalSearch">
+                <button class="btn btn-default" data-toggle="modal" title="Imprimir Listado" data-target="#frmFiltro">
                   <i class="fa fa-search fa-2x"></i><br/>Buscar
                 </button>
             </div>
